@@ -5,11 +5,6 @@ const logger = require("../utils/logger");
 class ProductRepository {
   constructor() {
     this.Product = Database.getModel("Product");
-    if (!this.Product) {
-      throw new Error("Product model not initialized properly.");
-    } else {
-      logger.info("Product model initialized successfully.");
-    }
   }
   async findAll(filters = {}) {
     try {
