@@ -1,7 +1,12 @@
 global:
-  scrape_interval: 5s
+  scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'unacademy-nodejs'
+  - job_name: "prometheus"
+    scrape_interval: 5s
     static_configs:
-      - targets: ['host.docker.internal:3000'] 
+      - targets: ["localhost:9090"]
+  - job_name: "unacademy-nodejs"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["host.docker.internal:3000"]

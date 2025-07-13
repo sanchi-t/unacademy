@@ -1,5 +1,5 @@
-const { Sequelize } = require('sequelize');
-const config = require('./index');
+const { Sequelize } = require("sequelize");
+const config = require("./index");
 
 class Database {
   constructor() {
@@ -10,22 +10,22 @@ class Database {
       {
         host: config.database.host,
         port: config.database.port,
-        dialect: 'postgres',
+        dialect: "postgres",
         pool: {
           max: config.database.max || 5,
           min: 0,
           acquire: 30000,
-          idle: 10000
+          idle: 10000,
         },
         dialectOptions: {
           ssl: config.database.ssl
             ? {
                 require: true,
-                rejectUnauthorized: false
+                rejectUnauthorized: false,
               }
-            : false
-        }
-      }
+            : false,
+        },
+      },
     );
 
     this.models = {};
@@ -38,20 +38,20 @@ class Database {
   async init() {
     try {
       await this.sequelize.authenticate();
-      console.info('✅ Database connection established.');
+      console.info("✅ Database connection established.");
 
       this._registerModels();
       await this.sync();
 
-      console.info('✅ Models registered and synced.');
+      console.info("✅ Models registered and synced.");
     } catch (err) {
-      console.error('❌ Database initialization failed:', err);
+      console.error("❌ Database initialization failed:", err);
       process.exit(1);
     }
   }
 
   _registerModels() {
-    const Product = require('../models/Product');
+    const Product = require("../models/Product");
 
     this.models.Product = Product(this.sequelize, Sequelize.DataTypes);
   }
@@ -68,7 +68,7 @@ class Database {
     try {
       return await this.sequelize.query(text, {
         replacements: params,
-        type: this.sequelize.QueryTypes.SELECT
+        type: this.sequelize.QueryTypes.SELECT,
       });
     } catch (error) {
       throw error;
@@ -85,7 +85,7 @@ class Database {
 
   async close() {
     await this.sequelize.close();
-    console.info('🛑 Database connection closed.');
+    console.info("🛑 Database connection closed.");
   }
 
   async sync(options = {}) {

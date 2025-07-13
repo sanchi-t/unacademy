@@ -1,6 +1,6 @@
-const redis = require('redis');
-const config = require('./index');
-const logger = require('../utils/logger');
+const redis = require("redis");
+const config = require("./index");
+const logger = require("../utils/logger");
 
 class RedisClient {
   constructor() {
@@ -13,20 +13,20 @@ class RedisClient {
       maxRetriesPerRequest: config.redis.maxRetriesPerRequest,
     });
 
-    this.client.on('connect', () => {
-      logger.info('Redis connected successfully');
+    this.client.on("connect", () => {
+      logger.info("Redis connected successfully");
     });
 
-    this.client.on('error', (error) => {
-      logger.error('Redis connection error:', error);
+    this.client.on("error", (error) => {
+      logger.error("Redis connection error:", error);
     });
 
-    this.client.on('ready', () => {
-      logger.info('Redis client ready');
+    this.client.on("ready", () => {
+      logger.info("Redis client ready");
     });
 
-    this.client.on('end', () => {
-      logger.info('Redis connection ended');
+    this.client.on("end", () => {
+      logger.info("Redis connection ended");
     });
 
     this.connect();
@@ -36,7 +36,7 @@ class RedisClient {
     try {
       await this.client.connect();
     } catch (error) {
-      logger.error('Failed to connect to Redis:', error);
+      logger.error("Failed to connect to Redis:", error);
       throw error;
     }
   }
@@ -46,7 +46,7 @@ class RedisClient {
       const value = await this.client.get(key);
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      logger.error('Redis GET error:', error);
+      logger.error("Redis GET error:", error);
       return null;
     }
   }
@@ -61,7 +61,7 @@ class RedisClient {
       }
       return true;
     } catch (error) {
-      logger.error('Redis SET error:', error);
+      logger.error("Redis SET error:", error);
       return false;
     }
   }
@@ -71,7 +71,7 @@ class RedisClient {
       await this.client.del(key);
       return true;
     } catch (error) {
-      logger.error('Redis DEL error:', error);
+      logger.error("Redis DEL error:", error);
       return false;
     }
   }
@@ -84,7 +84,7 @@ class RedisClient {
       }
       return true;
     } catch (error) {
-      logger.error('Redis DEL pattern error:', error);
+      logger.error("Redis DEL pattern error:", error);
       return false;
     }
   }
@@ -93,7 +93,7 @@ class RedisClient {
     try {
       return await this.client.exists(key);
     } catch (error) {
-      logger.error('Redis EXISTS error:', error);
+      logger.error("Redis EXISTS error:", error);
       return false;
     }
   }
@@ -103,14 +103,14 @@ class RedisClient {
       await this.client.flushAll();
       return true;
     } catch (error) {
-      logger.error('Redis FLUSHALL error:', error);
+      logger.error("Redis FLUSHALL error:", error);
       return false;
     }
   }
 
   async close() {
     await this.client.quit();
-    logger.info('Redis connection closed');
+    logger.info("Redis connection closed");
   }
 }
 

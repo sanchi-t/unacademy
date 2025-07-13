@@ -1,4 +1,4 @@
-const logger = require('../utils/logger');
+const logger = require("../utils/logger");
 
 class AppError extends Error {
   constructor(message, statusCode) {
@@ -12,52 +12,51 @@ class AppError extends Error {
 const errorHandler = (error, req, res, next) => {
   let { statusCode = 500, message } = error;
 
-  logger.error('Error occurred:', {
+  logger.error("Error occurred:", {
     error: error.message,
     stack: error.stack,
     url: req.originalUrl,
     method: req.method,
     ip: req.ip,
-    userAgent: req.get('User-Agent')
+    userAgent: req.get("User-Agent"),
   });
 
-  if (error.code === '23505') {
+  if (error.code === "23505") {
     statusCode = 409;
-    message = 'Duplicate entry found';
-  } else if (error.code === '23502') {
+    message = "Duplicate entry found";
+  } else if (error.code === "23502") {
     statusCode = 400;
-    message = 'Required field missing';
-  } else if (error.code === '23503') {
+    message = "Required field missing";
+  } else if (error.code === "23503") {
     statusCode = 400;
-    message = 'Invalid reference';
-  } else if (error.code === 'ECONNREFUSED') {
+    message = "Invalid reference";
+  } else if (error.code === "ECONNREFUSED") {
     statusCode = 503;
-    message = 'Service temporarily unavailable';
-  } else if (error.name === 'ValidationError') {
+    message = "Service temporarily unavailable";
+  } else if (error.name === "ValidationError") {
     statusCode = 400;
     message = error.message;
-  } else if (error.name === 'CastError') {
+  } else if (error.name === "CastError") {
     statusCode = 400;
-    message = 'Invalid ID format';
-  } else if (error.name === 'JsonWebTokenError') {
+    message = "Invalid ID format";
+  } else if (error.name === "JsonWebTokenError") {
     statusCode = 401;
-    message = 'Invalid token';
-  } else if (error.name === 'TokenExpiredError') {
+    message = "Invalid token";
+  } else if (error.name === "TokenExpiredError") {
     statusCode = 401;
-    message = 'Token expired';
+    message = "Token expired";
   }
-
 
   res.status(statusCode).json({
     error: true,
     message,
-    ...(process.env.NODE_ENV === 'development' && {
+    ...(process.env.NODE_ENV === "development" && {
       stack: error.stack,
-      details: error
+      details: error,
     }),
     timestamp: new Date().toISOString(),
     path: req.originalUrl,
-    method: req.method
+    method: req.method,
   });
 };
 
@@ -67,7 +66,7 @@ const notFoundHandler = (req, res) => {
     message: `Route ${req.originalUrl} not found`,
     timestamp: new Date().toISOString(),
     path: req.originalUrl,
-    method: req.method
+    method: req.method,
   });
 };
 
@@ -79,5 +78,5 @@ module.exports = {
   errorHandler,
   notFoundHandler,
   asyncHandler,
-  AppError
+  AppError,
 };

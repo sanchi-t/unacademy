@@ -1,43 +1,42 @@
-const { Op } = require('sequelize');
-const Database = require('../config/database');
-const logger = require('../utils/logger');
+const { Op } = require("sequelize");
+const Database = require("../config/database");
+const logger = require("../utils/logger");
 
 class ProductRepository {
-    constructor() {
-        this.Product = Database.getModel('Product');
-        if (!this.Product) {
-            throw new Error('Product model not initialized properly.');
-        }
-        else {
-            console.log('Product model initialized successfully.');
-        }
+  constructor() {
+    this.Product = Database.getModel("Product");
+    if (!this.Product) {
+      throw new Error("Product model not initialized properly.");
+    } else {
+      logger.info("Product model initialized successfully.");
     }
+  }
   async findAll(filters = {}) {
     try {
-      const { 
-        category, 
-        price_min, 
-        price_max, 
-        search, 
-        limit = 10, 
+      const {
+        category,
+        price_min,
+        price_max,
+        search,
+        limit = 10,
         offset = 0,
-        sort_by = 'createdAt',
-        sort_order = 'DESC'
+        sort_by = "createdAt",
+        sort_order = "DESC",
       } = filters;
 
       const where = {};
       const sortableFields = {
-      price: 'price',
-      name: 'name',
-      created_at: 'createdAt',
-    };
-    const safeSortBy = sortableFields[sort_by] || 'createdAt';
-    const safeSortOrder = ['ASC', 'DESC'].includes(sort_order.toUpperCase()) ? sort_order.toUpperCase() : 'DESC';
+        price: "price",
+        name: "name",
+        created_at: "createdAt",
+      };
+      const safeSortBy = sortableFields[sort_by] || "createdAt";
+      const safeSortOrder = ["ASC", "DESC"].includes(sort_order.toUpperCase())
+        ? sort_order.toUpperCase()
+        : "DESC";
       const order = [[safeSortBy, safeSortOrder]];
-      console.log("SortBy__________",sort_by, sort_order, order);
-      console.log("MINPRICE__________",price_min);
       if (category) {
-        where.category = category.toLowerCase()
+        where.category = category.toLowerCase();
       }
 
       if (price_min || price_max) {
@@ -49,7 +48,7 @@ class ProductRepository {
       if (search) {
         where[Op.or] = [
           { name: { [Op.iLike]: `%${search}%` } },
-          { description: { [Op.iLike]: `%${search}%` } }
+          { description: { [Op.iLike]: `%${search}%` } },
         ];
       }
       const products = await this.Product.findAll({
@@ -57,11 +56,11 @@ class ProductRepository {
         limit,
         offset,
         order,
-        raw: true
+        raw: true,
       });
       return products;
     } catch (error) {
-      logger.error('Error in ProductRepository.findAll:', error);
+      logger.error("Error in ProductRepository.findAll:", error);
       throw error;
     }
   }
@@ -85,13 +84,13 @@ class ProductRepository {
       if (search) {
         where[Op.or] = [
           { name: { [Op.iLike]: `%${search}%` } },
-          { description: { [Op.iLike]: `%${search}%` } }
+          { description: { [Op.iLike]: `%${search}%` } },
         ];
       }
 
       return await this.Product.count({ where });
     } catch (error) {
-      logger.error('Error in ProductRepository.getCount:', error);
+      logger.error("Error in ProductRepository.getCount:", error);
       throw error;
     }
   }
@@ -100,19 +99,19 @@ class ProductRepository {
     try {
       return await this.Product.findByPk(id, { raw: true });
     } catch (error) {
-      logger.error('Error in ProductRepository.findById:', error);
+      logger.error("Error in ProductRepository.findById:", error);
       throw error;
     }
   }
 
   async create(productData) {
     try {
-    if (productData.name) productData.name = productData.name.toLowerCase();
-    if (productData.category) productData.category = productData.category.toLowerCase();
-        console.log('Creating product with data:', productData);
+      if (productData.name) productData.name = productData.name.toLowerCase();
+      if (productData.category)
+        productData.category = productData.category.toLowerCase();
       return await this.Product.create(productData, { raw: true });
     } catch (error) {
-      logger.error('Error in ProductRepository.create:', error);
+      logger.error("Error in ProductRepository.create:", error);
       throw error;
     }
   }
@@ -121,7 +120,7 @@ class ProductRepository {
     try {
       const [affectedCount] = await this.Product.update(productData, {
         where: { id },
-        returning: true
+        returning: true,
       });
 
       if (affectedCount === 0) {
@@ -130,7 +129,7 @@ class ProductRepository {
 
       return await this.findById(id);
     } catch (error) {
-      logger.error('Error in ProductRepository.update:', error);
+      logger.error("Error in ProductRepository.update:", error);
       throw error;
     }
   }
@@ -145,7 +144,7 @@ class ProductRepository {
       await this.Product.destroy({ where: { id } });
       return product;
     } catch (error) {
-      logger.error('Error in ProductRepository.delete:', error);
+      logger.error("Error in ProductRepository.delete:", error);
       throw error;
     }
   }
@@ -153,14 +152,14 @@ class ProductRepository {
   async getCategories() {
     try {
       const categories = await this.Product.findAll({
-        attributes: ['category'],
-        group: ['category'],
-        raw: true
+        attributes: ["category"],
+        group: ["category"],
+        raw: true,
       });
 
-      return categories.map(item => item.category);
+      return categories.map((item) => item.category);
     } catch (error) {
-      logger.error('Error in ProductRepository.getCategories:', error);
+      logger.error("Error in ProductRepository.getCategories:", error);
       throw error;
     }
   }

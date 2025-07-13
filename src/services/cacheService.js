@@ -1,6 +1,6 @@
-const redis = require('../config/redis');
-const config = require('../config');
-const logger = require('../utils/logger');
+const redis = require("../config/redis");
+const config = require("../config");
+const logger = require("../utils/logger");
 
 class CacheService {
   constructor() {
@@ -22,7 +22,7 @@ class CacheService {
         return result;
       }, {});
     const filterString = JSON.stringify(sortedFilters);
-    return `${this.prefix}:listing:${Buffer.from(filterString).toString('base64')}`;
+    return `${this.prefix}:listing:${Buffer.from(filterString).toString("base64")}`;
   }
 
   generateCategoriesKey() {
@@ -33,16 +33,16 @@ class CacheService {
     try {
       const key = this.generateProductKey(id);
       const cached = await redis.get(key);
-      
+
       if (cached) {
-        console.debug(`Cache hit for product ${id}`);
+        logger.info(`Cache hit for product ${id}`);
         return cached;
       }
-      
-      console.debug(`Cache miss for product ${id}`);
+
+      logger.info(`Cache miss for product ${id}`);
       return null;
     } catch (error) {
-      console.error('Error getting product from cache:', error);
+      logger.error("Error getting product from cache:", error);
       return null;
     }
   }
@@ -51,10 +51,10 @@ class CacheService {
     try {
       const key = this.generateProductKey(id);
       await redis.set(key, product, this.productTTL);
-      console.debug(`Product ${id} cached for ${this.productTTL} seconds`);
+      logger.info(`Product ${id} cached for ${this.productTTL} seconds`);
       return true;
     } catch (error) {
-      console.error('Error setting product in cache:', error);
+      logger.error("Error setting product in cache:", error);
       return false;
     }
   }
@@ -63,10 +63,10 @@ class CacheService {
     try {
       const key = this.generateProductKey(id);
       await redis.del(key);
-      console.debug(`Product ${id} cache invalidated`);
+      logger.info(`Product ${id} cache invalidated`);
       return true;
     } catch (error) {
-      console.error('Error invalidating product cache:', error);
+      logger.error("Error invalidating product cache:", error);
       return false;
     }
   }
@@ -75,16 +75,20 @@ class CacheService {
     try {
       const key = this.generateListingKey(filters);
       const cached = await redis.get(key);
-      
+
       if (cached) {
-        console.debug(`Cache hit for listing with filters: ${JSON.stringify(filters)}`);
+        logger.info(
+          `Cache hit for listing with filters: ${JSON.stringify(filters)}`,
+        );
         return cached;
       }
-      
-      console.debug(`Cache miss for listing with filters: ${JSON.stringify(filters)}`);
+
+      logger.info(
+        `Cache miss for listing with filters: ${JSON.stringify(filters)}`,
+      );
       return null;
     } catch (error) {
-      console.error('Error getting listing from cache:', error);
+      logger.error("Error getting listing from cache:", error);
       return null;
     }
   }
@@ -93,10 +97,10 @@ class CacheService {
     try {
       const key = this.generateListingKey(filters);
       await redis.set(key, listing, this.listingTTL);
-      console.debug(`Listing cached for ${this.listingTTL} seconds`);
+      logger.info(`Listing cached for ${this.listingTTL} seconds`);
       return true;
     } catch (error) {
-      console.error('Error setting listing in cache:', error);
+      logger.error("Error setting listing in cache:", error);
       return false;
     }
   }
@@ -105,10 +109,9 @@ class CacheService {
     try {
       const pattern = `${this.prefix}:listing:*`;
       await redis.delPattern(pattern);
-      console.debug('All listing caches invalidated');
       return true;
     } catch (error) {
-      console.error('Error invalidating listing caches:', error);
+      logger.error("Error invalidating listing caches:", error);
       return false;
     }
   }
@@ -117,16 +120,15 @@ class CacheService {
     try {
       const key = this.generateCategoriesKey();
       const cached = await redis.get(key);
-      
+
       if (cached) {
-        console.debug('Cache hit for categories');
+        logger.info("Cache hit for categories");
         return cached;
       }
-      
-      console.debug('Cache miss for categories');
+
       return null;
     } catch (error) {
-      console.error('Error getting categories from cache:', error);
+      logger.error("Error getting categories from cache:", error);
       return null;
     }
   }
@@ -135,10 +137,9 @@ class CacheService {
     try {
       const key = this.generateCategoriesKey();
       await redis.set(key, categories, this.defaultTTL);
-      console.debug(`Categories cached for ${this.defaultTTL} seconds`);
       return true;
     } catch (error) {
-      console.error('Error setting categories in cache:', error);
+      logger.error("Error setting categories in cache:", error);
       return false;
     }
   }
@@ -147,10 +148,9 @@ class CacheService {
     try {
       const key = this.generateCategoriesKey();
       await redis.del(key);
-      console.debug('Categories cache invalidated');
       return true;
     } catch (error) {
-      console.error('Error invalidating categories cache:', error);
+      logger.error("Error invalidating categories cache:", error);
       return false;
     }
   }
@@ -160,12 +160,11 @@ class CacheService {
       await Promise.all([
         this.invalidateProduct(productId),
         this.invalidateListings(),
-        this.invalidateCategories()
+        this.invalidateCategories(),
       ]);
-      console.debug(`All product-related caches invalidated for product ${productId}`);
       return true;
     } catch (error) {
-      console.error('Error invalidating product-related caches:', error);
+      logger.error("Error invalidating product-related caches:", error);
       return false;
     }
   }
@@ -175,15 +174,15 @@ class CacheService {
       const productKeys = await redis.client.keys(`${this.prefix}:product:*`);
       const listingKeys = await redis.client.keys(`${this.prefix}:listing:*`);
       const categoryKeys = await redis.client.keys(`${this.prefix}:categories`);
-      
+
       return {
         products: productKeys.length,
         listings: listingKeys.length,
         categories: categoryKeys.length,
-        total: productKeys.length + listingKeys.length + categoryKeys.length
+        total: productKeys.length + listingKeys.length + categoryKeys.length,
       };
     } catch (error) {
-      console.error('Error getting cache stats:', error);
+      logger.error("Error getting cache stats:", error);
       return { products: 0, listings: 0, categories: 0, total: 0 };
     }
   }
@@ -192,10 +191,10 @@ class CacheService {
     try {
       const pattern = `${this.prefix}:*`;
       await redis.delPattern(pattern);
-      console.info('All cache cleared');
+      logger.info("All cache cleared");
       return true;
     } catch (error) {
-      console.error('Error clearing all cache:', error);
+      logger.error("Error clearing all cache:", error);
       return false;
     }
   }
