@@ -36,15 +36,6 @@ const errorHandler = (error, req, res, next) => {
   } else if (error.name === "ValidationError") {
     statusCode = 400;
     message = error.message;
-  } else if (error.name === "CastError") {
-    statusCode = 400;
-    message = "Invalid ID format";
-  } else if (error.name === "JsonWebTokenError") {
-    statusCode = 401;
-    message = "Invalid token";
-  } else if (error.name === "TokenExpiredError") {
-    statusCode = 401;
-    message = "Token expired";
   }
 
   res.status(statusCode).json({

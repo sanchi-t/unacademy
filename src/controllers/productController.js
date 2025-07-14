@@ -124,12 +124,6 @@ class ProductController {
         },
       });
     } catch (error) {
-      if (error.code === "23505") {
-        return res.status(409).json({
-          error: "Conflict",
-          message: "Product with this value already exists",
-        });
-      }
       next(error);
     }
   }
@@ -171,13 +165,6 @@ class ProductController {
         },
       });
     } catch (error) {
-      if (error.code === "23505") {
-        // Unique constraint violation
-        return res.status(409).json({
-          error: "Conflict",
-          message: "Product with this name already exists",
-        });
-      }
       next(error);
     }
   }
@@ -218,7 +205,7 @@ class ProductController {
   async getCategories(req, res, next) {
     try {
       const result = await productService.getCategories();
-
+      res.locals.cached = result.cached;
       res.status(200).json({
         success: true,
         data: result.categories,

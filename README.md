@@ -18,3 +18,23 @@ Clone the repository and follow the setup instructions in the documentation to g
 - Start database instance
 - Run `docker compose up -d`
 - Start the server with `node server`
+
+## Grafana Queries
+
+```
+sum by (cache_status) (
+  avg_over_time(http_request_duration_ms_sum[1m])
+)
+/
+sum by (cache_status) (
+  avg_over_time(http_request_duration_ms_count[1m])
+)
+
+```
+
+```
+sum by (method, route, cache_status) (http_request_duration_ms_sum)
+/
+sum by (method, route, cache_status) (http_request_duration_ms_count)
+
+```

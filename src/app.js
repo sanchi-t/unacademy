@@ -16,7 +16,6 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "10mb" }));
 
-// Prometheus setup
 const register = new client.Registry();
 client.collectDefaultMetrics({ register });
 
@@ -29,7 +28,6 @@ const httpRequestDurationMicroseconds = new client.Histogram({
 
 register.registerMetric(httpRequestDurationMicroseconds);
 
-// Metrics middleware
 function metricsMiddleware(req, res, next) {
   const startEpoch = Date.now();
 
@@ -38,7 +36,6 @@ function metricsMiddleware(req, res, next) {
 
     const fullPath = req.originalUrl || req.url || "unknown_path";
 
-    // Normalize route: strip query params and mask IDs
     let normalizedRoute = fullPath.split("?")[0];
     normalizedRoute = normalizedRoute.replace(
       /\/api\/products\/\d+/g,
