@@ -11,9 +11,8 @@ let app;
 let server;
 
 beforeAll(async () => {
-  await Database.init(); // initialize DB first
+  await Database.init();
 
-  // Now import app and routes AFTER DB init
   app = require("../../src/app");
   const productRoutes = require("../../src/routes/productRoutes");
   app.use("/api/products", productRoutes);

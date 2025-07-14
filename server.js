@@ -2,8 +2,10 @@ const app = require("./src/app.js");
 const config = require("./src/config/index.js");
 const logger = require("./src/utils/logger.js");
 const Database = require("./src/config/database.js");
-const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandler'); // adjust path
-
+const {
+  errorHandler,
+  notFoundHandler,
+} = require("./src/middleware/errorHandler");
 
 const PORT = config.port || 3000;
 

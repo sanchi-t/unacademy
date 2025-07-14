@@ -191,6 +191,7 @@ class CacheService {
     try {
       const pattern = `${this.prefix}:*`;
       await redis.delPattern(pattern);
+      await redis.flushAll();
       logger.info("All cache cleared");
       return true;
     } catch (error) {
