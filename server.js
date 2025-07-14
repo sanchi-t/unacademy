@@ -2,6 +2,8 @@ const app = require("./src/app.js");
 const config = require("./src/config/index.js");
 const logger = require("./src/utils/logger.js");
 const Database = require("./src/config/database.js");
+const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandler'); // adjust path
+
 
 const PORT = config.port || 3000;
 
@@ -11,6 +13,10 @@ const startServer = async () => {
 
     const productRoutes = require("./src/routes/productRoutes.js");
     app.use("/api/products", productRoutes);
+
+    app.use(notFoundHandler);
+
+    app.use(errorHandler);
 
     app.listen(PORT, () => {
       logger.info(
